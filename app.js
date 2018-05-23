@@ -13,20 +13,20 @@ function main() {
     restapi.route('/notes')
         .get(notesGETall)
         .post(notesPOST)
-
+/*
     restapi.route('/notes/:key')
         .get(noteGETbyID)
         .put(notePUTbyID)
         .delete(noteDELETEbyID)
-
+*/
     server=express();
     server.use('/api/',restapi);
     server.listen(3000);
 }
 
 function initDb(){
-    db.run("CREATE OR IGNORE notes (id INTEGER PRIMARY KEY, body TEXT)");
-    db.run("INSERT INTO notes (id, body) VALUES (1, This is the first note)(2, This is the second note)(3, This is the third note)");
+    db.run("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, body TEXT)");
+    db.run("INSERT INTO notes (id, body) VALUES (1, 'This is the first note'),(2, 'This is the second note'),(3, 'This is the third note')");
 }
 
 function notesGETall(res) {
