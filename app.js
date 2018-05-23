@@ -46,11 +46,19 @@ function notesPOST(req, res) {
 }
 
 function noteGETbyID(req, res) {
-
+    let sql = `SELECT * FROM notes WHERE id=${req.params.key}`;
+    db.all(sql, function(err,rows){
+        if(err) res.json(err);
+        else res.json(rows);        
+    });
 }
 
 function notePUTbyID(req, res) {
-    
+    let sql = `INSERT OR REPLACE INTO notes ('id','body') VALUES ('${req.params.key}','${req.body.body}')`;
+    db.run(sql, function(err){
+        if(err) res.json(err);
+        else res.send('succ');
+    });
 }
 
 function noteDELETEbyID(req, res) {
