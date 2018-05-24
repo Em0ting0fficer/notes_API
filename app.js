@@ -18,6 +18,21 @@ function main() {
         .get(noteGETbyID)
         .put(notePUTbyID)
         .delete(noteDELETEbyID)
+/*
+    restapi.route('/notes/:user')
+        .get(notesGETbyUSER)
+        .post(notePOSTbyUSER)
+        .put(notePUTbyUSER)
+        .delete(noteDELTEbyUSER)
+*/
+    restapi.route('/users')
+        .get(usersGETall)
+        .post(userPOST)
+
+    restapi.route('/users/:user')
+        .get(userGETbyUSER)
+        .put(userPUTbyUSER)
+        .delete(userDELETE)
 
     server=express();
     server.use('/api/',restapi);
@@ -25,7 +40,8 @@ function main() {
 }
 
 function initDb(){
-    db.run("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, body TEXT)");
+    db.run("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, title TEXT, body TEXT, userfk INTEGER)");
+    db.run("CREATE TABLE IF NOT EXISTS users (userPK INTEGER PRIMARY KEY, user TEXT)");
     //db.run("INSERT INTO notes (body) VALUES ('This is the first note'),('This is the second note'),('This is the third note')");
 }
 
@@ -38,7 +54,7 @@ function notesGETall(req, res) {
 }
 
 function notesPOST(req, res) {
-    let sql = `INSERT INTO notes ('body') VALUES ('${req.body.body}') `;
+    let sql = `INSERT INTO notes ('title','body','user') VALUES ('${req.body.title}','${req.body.body}','${req.body.user}') `;
     db.run(sql, function(err){
         if(err) res.json(err);
         else res.send('succ');
@@ -54,7 +70,7 @@ function noteGETbyID(req, res) {
 }
 
 function notePUTbyID(req, res) {
-    let sql = `INSERT OR REPLACE INTO notes ('id','body') VALUES ('${req.params.key}','${req.body.body}')`;
+    let sql = `INSERT OR REPLACE INTO notes ('id','title','body','user') VALUES ('${req.params.key}','${req.body.title}','${req.body.body}','${req.body.user}')`;
     db.run(sql, function(err){
         if(err) res.json(err);
         else res.send('succ');
@@ -66,6 +82,22 @@ function noteDELETEbyID(req, res) {
     db.run(sql, function(err){
         if(err) res.json(err);
         else res.send('succ');
+    });
+}
+
+function usersGETall(req, res) {
+    let sql = `SELECT * FROM users`;
+    db.all(sql, function(err,rows){
+        if(err) res.json(err);
+        else res.json(rows);        
+    });
+}
+
+function userPOST(req, res) {
+    let sql = `INSERT INTO users ('user') VALUES ('${req.body.user}')`;
+    db.all(sql, function(err,rows){
+        if(err) res.json(err);
+        else res.send('succ');        
     });
 }
 
