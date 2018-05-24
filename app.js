@@ -18,18 +18,18 @@ function main() {
         .get(noteGETbyID)
         .put(notePUTbyID)
         .delete(noteDELETEbyID)
-/*
+
     restapi.route('/notes/:user')
         .get(notesGETbyUSER)
         .post(notePOSTbyUSER)
         .put(notePUTbyUSER)
         .delete(noteDELTEbyUSER)
-*/
+
     restapi.route('/users')
         .get(usersGETall)
         .post(userPOST)
 
-    restapi.route('/users/:user')
+    restapi.route('/users/:key')
         .get(userGETbyUSER)
         .put(userPUTbyUSER)
         .delete(userDELETE)
@@ -98,6 +98,62 @@ function userPOST(req, res) {
     db.all(sql, function(err,rows){
         if(err) res.json(err);
         else res.send('succ');        
+    });
+}
+
+function userGETbyUSER(req, res) {
+    let sql = `SELECT * FROM users WHERE userPK=${req.params.key}`;
+    db.all(sql, function(err,rows){
+        if(err) res.json(err);
+        else res.json(rows);        
+    });
+}
+
+function userPUTbyUSER(req, res) {
+    let sql = `INSERT OR REPLACE INTO users ('userPK','user') VALUES ('${req.params.key}','${req.body.user}')`;
+    db.run(sql, function(err){
+        if(err) res.json(err);
+        else res.send('succ');
+    });
+}
+
+function userDELETE(req, res) {
+    let sql = `DELETE FROM users WHERE userPK=${req.params.key}`;
+    db.run(sql, function(err){
+        if(err) res.json(err);
+        else res.send('succ');
+    });
+}
+
+function notesGETbyUSER(req, res) {
+    let sql = `SELECT * FROM notes WHERE userfk=${req.params.key}`;
+    db.all(sql, function(err,rows){
+        if(err) res.json(err);
+        else res.json(rows);        
+    });
+}
+
+function notePOSTbyUSER(req, res) {
+    let sql = `INSERT INTO notes ('title','body','userfk') VALUES ('${req.body.title}','${req.body.body}','${req.params.key}') `;
+    db.run(sql, function(err){
+        if(err) res.json(err);
+        else res.send('succ');
+    });
+}
+
+function notePUTbyUSER(req, res) {
+    let sql = `INSERT OR REPLACE INTO notes ('id','title','body','userfk') VALUES ('${req.body.id}','${req.body.title}','${req.body.body}','${req.params.key}')`;
+    db.run(sql, function(err){
+        if(err) res.json(err);
+        else res.send('succ');
+    });
+}
+
+function noteDELTEbyUSER(req, res) {
+    let sql = `DELETE FROM notes WHERE userfk=${req.params.key} && id=${req.body.id}`;
+    db.run(sql, function(err){
+        if(err) res.json(err);
+        else res.send('succ');
     });
 }
 
