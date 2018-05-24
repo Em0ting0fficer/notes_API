@@ -19,7 +19,7 @@ function main() {
         .put(notePUTbyID)
         .delete(noteDELETEbyID)
 
-    restapi.route('/notes/:user')
+    restapi.route('/notes/u/:key')
         .get(notesGETbyUSER)
         .post(notePOSTbyUSER)
         .put(notePUTbyUSER)
@@ -54,7 +54,7 @@ function notesGETall(req, res) {
 }
 
 function notesPOST(req, res) {
-    let sql = `INSERT INTO notes ('title','body','user') VALUES ('${req.body.title}','${req.body.body}','${req.body.user}') `;
+    let sql = `INSERT INTO notes ('title','body','userfk') VALUES ('${req.body.title}','${req.body.body}','${req.body.user}') `;
     db.run(sql, function(err){
         if(err) res.json(err);
         else res.send('succ');
@@ -70,7 +70,7 @@ function noteGETbyID(req, res) {
 }
 
 function notePUTbyID(req, res) {
-    let sql = `INSERT OR REPLACE INTO notes ('id','title','body','user') VALUES ('${req.params.key}','${req.body.title}','${req.body.body}','${req.body.user}')`;
+    let sql = `INSERT OR REPLACE INTO notes ('id','title','body','userfk') VALUES ('${req.params.key}','${req.body.title}','${req.body.body}','${req.body.user}')`;
     db.run(sql, function(err){
         if(err) res.json(err);
         else res.send('succ');
@@ -119,9 +119,15 @@ function userPUTbyUSER(req, res) {
 
 function userDELETE(req, res) {
     let sql = `DELETE FROM users WHERE userPK=${req.params.key}`;
+    let sql2 = `DELETE FROM notes WHERE userfk=${req.params.key}`;
     db.run(sql, function(err){
         if(err) res.json(err);
-        else res.send('succ');
+        else {
+            db.run(sql2, function(err){
+                if(err) res.json(err);
+                else res.send('succ');
+            });
+        }
     });
 }
 
@@ -150,7 +156,7 @@ function notePUTbyUSER(req, res) {
 }
 
 function noteDELTEbyUSER(req, res) {
-    let sql = `DELETE FROM notes WHERE userfk=${req.params.key} && id=${req.body.id}`;
+    let sql = `DELETE FROM notes WHERE userfk=${req.params.key} AND id=${req.body.id}`;
     db.run(sql, function(err){
         if(err) res.json(err);
         else res.send('succ');
