@@ -29,7 +29,6 @@ function main() {
         .post(lib.userPOST)
 
     restapi.route('/users/:key')
-        //.get(lib.notesGETbyUSERKEY)
         .get(lib.userGETbyUSER)
         .put(lib.userPUTbyUSER)
         .delete(lib.userDELETE)

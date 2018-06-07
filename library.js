@@ -2,81 +2,73 @@ var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('data/notes.db');
 
 
-function initDb(){
-    db.run("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, title TEXT, body TEXT, userfk INTEGER)");
+function initDb() {
     db.run("CREATE TABLE IF NOT EXISTS users (userPK INTEGER PRIMARY KEY, user TEXT)");
-    //db.run("CREATE TABLE IF NOT EXISTS usernotes (")
+    db.run("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, title TEXT, body TEXT,userFK INTERGER, FOREIGN KEY(userFK) REFERENCES users(userPK))");
+    //db.run("SELECT notes.userFK, users.userPK FROM notes INNER JOIN users ON users.userPK = notes.userFK");
     //db.run("INSERT INTO notes (body) VALUES ('This is the first note'),('This is the second note'),('This is the third note')");
 }
 
 function notesGETall(req, res) {
     let sql = `SELECT * FROM notes`;
-    db.all(sql, function(err,rows){
-        if(err) res.json(err);
-        else res.json(rows);        
+    db.all(sql, function (err, rows) {
+        if (err) res.json(err);
+        else res.json(rows);
     });
 }
 
 function notesPOST(req, res) {
-let sql = `INSERT INTO notes ('title','body','userfk') VALUES ('${req.body.title}','${req.body.body}','${req.body.user}') `;
-    db.run(sql, function(err){
-        if(err) res.json(err);
+    let sql = `INSERT INTO notes ('title','body','userFK') VALUES ('${req.body.title}','${req.body.body}','${req.body.user}') `;
+    db.run(sql, function (err) {
+        if (err) res.json(err);
         else res.send('succ');
     });
 }
 
 function noteGETbyID(req, res) {
     let sql = `SELECT * FROM notes WHERE id=${req.params.key}`;
-    db.all(sql, function(err,rows){
-        if(err) res.json(err);
-        else res.json(rows);        
+    db.all(sql, function (err, rows) {
+        if (err) res.json(err);
+        else res.json(rows);
     });
 }
 
 function notePUTbyID(req, res) {
     let sql = `INSERT OR REPLACE INTO notes ('id','title','body','userfk') VALUES ('${req.params.key}','${req.body.title}','${req.body.body}','${req.body.user}')`;
-    db.run(sql, function(err){
-        if(err) res.json(err);
+    db.run(sql, function (err) {
+        if (err) res.json(err);
         else res.send('succ');
     });
 }
 
 function noteDELETEbyID(req, res) {
     let sql = `DELETE FROM notes WHERE id=${req.params.key}`;
-    db.run(sql, function(err){
-        if(err) res.json(err);
+    db.run(sql, function (err) {
+        if (err) res.json(err);
         else res.send('succ');
     });
 }
 
 function usersGETall(req, res) {
     let sql = `SELECT * FROM users`;
-    db.all(sql, function(err,rows){
-        if(err) res.json(err);
-        else res.json(rows);        
+    db.all(sql, function (err, rows) {
+        if (err) res.json(err);
+        else res.json(rows);
     });
 }
 
 function userPOST(req, res) {
     let sql = `INSERT INTO users ('user') VALUES ('${req.body.user}')`;
-    db.all(sql, function(err,rows){
-        if(err) res.json(err);
-        else res.send('succ');        
-    });
-}
-
-function userGETbyUSER(req, res) {
-    let sql = `SELECT * FROM users WHERE userPK=${req.params.key}`;
-    db.all(sql, function(err,rows){
-        if(err) res.json(err);
-        else res.json(rows);        
+    db.all(sql, function (err, rows) {
+        if (err) res.json(err);
+        else res.send('succ');
     });
 }
 
 function userPUTbyUSER(req, res) {
     let sql = `INSERT OR REPLACE INTO users ('userPK','user') VALUES ('${req.params.key}','${req.body.user}')`;
-    db.run(sql, function(err){
-        if(err) res.json(err);
+    db.run(sql, function (err) {
+        if (err) res.json(err);
         else res.send('succ');
     });
 }
@@ -84,11 +76,11 @@ function userPUTbyUSER(req, res) {
 function userDELETE(req, res) {
     let sql = `DELETE FROM users WHERE userPK=${req.params.key}`;
     let sql2 = `DELETE FROM notes WHERE userfk=${req.params.key}`;
-    db.run(sql, function(err){
-        if(err) res.json(err);
+    db.run(sql, function (err) {
+        if (err) res.json(err);
         else {
-            db.run(sql2, function(err){
-                if(err) res.json(err);
+            db.run(sql2, function (err) {
+                if (err) res.json(err);
                 else res.send('succ');
             });
         }
@@ -97,45 +89,58 @@ function userDELETE(req, res) {
 
 function notesGETbyUSER(req, res) {
     let sql = `SELECT * FROM notes WHERE userfk=${req.params.key}`;
-    db.all(sql, function(err,rows){
-        if(err) res.json(err);
-        else res.json(rows);        
+    db.all(sql, function (err, rows) {
+        if (err) res.json(err);
+        else res.json(rows);
     });
 }
 
 function notePOSTbyUSER(req, res) {
     let sql = `INSERT INTO notes ('title','body','userfk') VALUES ('${req.body.title}','${req.body.body}','${req.params.key}') `;
-    db.run(sql, function(err){
-        if(err) res.json(err);
+    db.run(sql, function (err) {
+        if (err) res.json(err);
         else res.send('succ');
     });
 }
 
 function notePUTbyUSER(req, res) {
     let sql = `INSERT OR REPLACE INTO notes ('id','title','body','userfk') VALUES ('${req.body.id}','${req.body.title}','${req.body.body}','${req.params.key}')`;
-    db.run(sql, function(err){
-        if(err) res.json(err);
+    db.run(sql, function (err) {
+        if (err) res.json(err);
         else res.send('succ');
     });
 }
 
 function noteDELTEbyUSER(req, res) {
     let sql = `DELETE FROM notes WHERE userfk=${req.params.key} AND id=${req.body.id}`;
-    db.run(sql, function(err){
-        if(err) res.json(err);
+    db.run(sql, function (err) {
+        if (err) res.json(err);
         else res.send('succ');
     });
 }
 
-function notesGETbyUSERKEY(req, res) {
-    let sql = `SELECT id FROM notes WHERE userfk=${req.params.key}`;
-    let ids = [];
-    db.all(sql, function(err, rows){
-        rows.forEach(element => {
-            ids.push(`localhost:3000/api/notes/${element.id}`);
+function userGETbyUSER(req, res) {
+    result = {};
+    db.serialize(function () {
+        let sql = `SELECT * FROM users WHERE userPK=${req.params.key}`;
+        db.all(sql, function (err, rows) {
+            if (err) res.json(err);
+            else {
+                result.user = rows[0].user;
+                result.notes = [];
+                let sql2 = `SELECT id FROM notes WHERE userfk=${req.params.key}`;
+                let ids = [];
+                db.all(sql2, function (err, rows) {
+                    rows.forEach(element => {
+                        result.notes.push(`localhost:3000/api/notes/${element.id}`);
+                    });
+                    if (err) res.json(err);
+                    else {
+                        res.json(result)
+                    };
+                })
+            }
         });
-        if(err) res.json(err);
-        else res.json(ids);      
     })
 }
 
@@ -155,5 +160,5 @@ module.exports = {
     userGETbyUSER,
     userPUTbyUSER,
     userDELETE,
-    notesGETbyUSERKEY,
 }
+
