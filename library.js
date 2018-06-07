@@ -3,9 +3,9 @@ var db = new sqlite3.Database('data/notes.db');
 
 
 function initDb() {
-    db.run("CREATE TABLE IF NOT EXISTS users (userPK INTEGER PRIMARY KEY, user TEXT)");
-    db.run("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, title TEXT, body TEXT,userFK INTERGER, FOREIGN KEY(userFK) REFERENCES users(userPK))");
-    //db.run("SELECT notes.userFK, users.userPK FROM notes INNER JOIN users ON users.userPK = notes.userFK");
+    db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, user TEXT)");
+    db.run("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, title TEXT, body TEXT,user INTEGER, FOREIGN KEY(user) REFERENCES users(id))");
+    db.run("PRAGMA foreign_keys = ON");
     //db.run("INSERT INTO notes (body) VALUES ('This is the first note'),('This is the second note'),('This is the third note')");
 }
 
@@ -18,7 +18,7 @@ function notesGETall(req, res) {
 }
 
 function notesPOST(req, res) {
-    let sql = `INSERT INTO notes ('title','body','userFK') VALUES ('${req.body.title}','${req.body.body}','${req.body.user}') `;
+    let sql = `INSERT INTO notes ('title','body','user') VALUES ('${req.body.title}','${req.body.body}','${req.body.user}') `;
     db.run(sql, function (err) {
         if (err) res.json(err);
         else res.send('succ');
