@@ -5,6 +5,7 @@ var db = new sqlite3.Database('data/notes.db');
 function initDb(){
     db.run("CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, title TEXT, body TEXT, userfk INTEGER)");
     db.run("CREATE TABLE IF NOT EXISTS users (userPK INTEGER PRIMARY KEY, user TEXT)");
+    //db.run("CREATE TABLE IF NOT EXISTS usernotes (")
     //db.run("INSERT INTO notes (body) VALUES ('This is the first note'),('This is the second note'),('This is the third note')");
 }
 
@@ -126,6 +127,18 @@ function noteDELTEbyUSER(req, res) {
     });
 }
 
+function notesGETbyUSERKEY(req, res) {
+    let sql = `SELECT id FROM notes WHERE userfk=${req.params.key}`;
+    let ids = [];
+    db.all(sql, function(err, rows){
+        rows.forEach(element => {
+            ids.push(`localhost:3000/api/notes/${element.id}`);
+        });
+        if(err) res.json(err);
+        else res.json(ids);      
+    })
+}
+
 module.exports = {
     initDb,
     notesGETall,
@@ -142,4 +155,5 @@ module.exports = {
     userGETbyUSER,
     userPUTbyUSER,
     userDELETE,
+    notesGETbyUSERKEY,
 }
