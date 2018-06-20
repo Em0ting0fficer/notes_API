@@ -34,7 +34,7 @@ function noteGETbyID(req, res) {
 }
 
 function notePUTbyID(req, res) {
-    let sql = `INSERT OR REPLACE INTO notes ('id','title','body','userfk') VALUES ('${req.params.key}','${req.body.title}','${req.body.body}','${req.body.user}')`;
+    let sql = `INSERT OR REPLACE INTO notes ('id','title','body','user') VALUES ('${req.params.key}','${req.body.title}','${req.body.body}','${req.body.user}')`;
     db.run(sql, function (err) {
         if (err) res.json(err);
         else res.send('succ');
@@ -66,7 +66,7 @@ function userPOST(req, res) {
 }
 
 function userPUTbyUSER(req, res) {
-    let sql = `INSERT OR REPLACE INTO users ('userPK','user') VALUES ('${req.params.key}','${req.body.user}')`;
+    let sql = `INSERT OR REPLACE INTO users ('id','user') VALUES ('${req.params.key}','${req.body.user}')`;
     db.run(sql, function (err) {
         if (err) res.json(err);
         else res.send('succ');
@@ -74,12 +74,12 @@ function userPUTbyUSER(req, res) {
 }
 
 function userDELETE(req, res) {
-    let sql = `DELETE FROM users WHERE userPK=${req.params.key}`;
-    let sql2 = `DELETE FROM notes WHERE userfk=${req.params.key}`;
-    db.run(sql, function (err) {
+    let sql = `DELETE FROM users WHERE id=${req.params.key}`;
+    let sql2 = `DELETE FROM notes WHERE user=${req.params.key}`;
+    db.run(sql2, function (err) {
         if (err) res.json(err);
         else {
-            db.run(sql2, function (err) {
+            db.run(sql, function (err) {
                 if (err) res.json(err);
                 else res.send('succ');
             });
@@ -88,7 +88,7 @@ function userDELETE(req, res) {
 }
 
 function notesGETbyUSER(req, res) {
-    let sql = `SELECT * FROM notes WHERE userfk=${req.params.key}`;
+    let sql = `SELECT * FROM notes WHERE user${req.params.key}`;
     db.all(sql, function (err, rows) {
         if (err) res.json(err);
         else res.json(rows);
@@ -96,7 +96,7 @@ function notesGETbyUSER(req, res) {
 }
 
 function notePOSTbyUSER(req, res) {
-    let sql = `INSERT INTO notes ('title','body','userfk') VALUES ('${req.body.title}','${req.body.body}','${req.params.key}') `;
+    let sql = `INSERT INTO notes ('title','body','user') VALUES ('${req.body.title}','${req.body.body}','${req.params.key}') `;
     db.run(sql, function (err) {
         if (err) res.json(err);
         else res.send('succ');
@@ -104,7 +104,7 @@ function notePOSTbyUSER(req, res) {
 }
 
 function notePUTbyUSER(req, res) {
-    let sql = `INSERT OR REPLACE INTO notes ('id','title','body','userfk') VALUES ('${req.body.id}','${req.body.title}','${req.body.body}','${req.params.key}')`;
+    let sql = `INSERT OR REPLACE INTO notes ('id','title','body','user') VALUES ('${req.body.id}','${req.body.title}','${req.body.body}','${req.params.key}')`;
     db.run(sql, function (err) {
         if (err) res.json(err);
         else res.send('succ');
@@ -112,7 +112,7 @@ function notePUTbyUSER(req, res) {
 }
 
 function noteDELTEbyUSER(req, res) {
-    let sql = `DELETE FROM notes WHERE userfk=${req.params.key} AND id=${req.body.id}`;
+    let sql = `DELETE FROM notes WHERE user=${req.params.key} AND id=${req.body.id}`;
     db.run(sql, function (err) {
         if (err) res.json(err);
         else res.send('succ');
@@ -122,13 +122,13 @@ function noteDELTEbyUSER(req, res) {
 function userGETbyUSER(req, res) {
     result = {};
     db.serialize(function () {
-        let sql = `SELECT * FROM users WHERE userPK=${req.params.key}`;
+        let sql = `SELECT * FROM users WHERE id=${req.params.key}`;
         db.all(sql, function (err, rows) {
             if (err) res.json(err);
             else {
                 result.user = rows[0].user;
                 result.notes = [];
-                let sql2 = `SELECT id FROM notes WHERE userfk=${req.params.key}`;
+                let sql2 = `SELECT id FROM notes WHERE user=${req.params.key}`;
                 let ids = [];
                 db.all(sql2, function (err, rows) {
                     rows.forEach(element => {
